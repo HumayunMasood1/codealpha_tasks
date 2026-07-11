@@ -1,0 +1,40 @@
+{% extends 'store/base.html' %}
+{% block title %}Create Account — NexShop{% endblock %}
+{% block content %}
+
+<div class="container">
+  <div class="auth-card">
+    <div class="form-title">Create Account</div>
+
+    {% if error %}
+      <div class="error-msg">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" name="username" placeholder="cool_username" required autofocus>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" placeholder="you@email.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password1" placeholder="••••••••" required>
+      </div>
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <input type="password" name="password2" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn-accent" style="width:100%;padding:.75rem;font-size:1rem;border-radius:6px;border:none;margin-top:.5rem">Create Account</button>
+    </form>
+
+    <div class="form-link">
+      Already have an account? <a href="/login/">Login</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

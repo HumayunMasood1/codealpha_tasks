@@ -1,0 +1,36 @@
+{% extends 'store/base.html' %}
+{% block title %}My Orders — NexShop{% endblock %}
+{% block content %}
+
+<div class="container" style="padding-top:2.5rem">
+  <h1 class="section-title">My Orders</h1>
+
+  {% if orders %}
+    {% for order in orders %}
+    <div class="order-card">
+      <div class="order-card-header">
+        <div class="order-num">Order #{{ order.id }}</div>
+        <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+      </div>
+      <div class="order-items-list">
+        {% for item in order.items.all %}
+          {{ item.quantity }}× {{ item.product.name }}<br>
+        {% endfor %}
+      </div>
+      <div class="order-meta">
+        <span>{{ order.created_at|date:"M d, Y" }}</span>
+        <span>Total: <strong>${{ order.total_price }}</strong></span>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📦</div>
+      <h2>No orders yet</h2>
+      <p>Place your first order to see it here.</p>
+      <a href="/" class="btn-accent" style="display:inline-block;margin-top:1.5rem;padding:.65rem 2rem">Shop Now</a>
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}

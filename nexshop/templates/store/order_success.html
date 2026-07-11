@@ -1,0 +1,21 @@
+{% extends 'store/base.html' %}
+{% block title %}Order Confirmed — NexShop{% endblock %}
+{% block content %}
+
+<div class="container">
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <h1>Order Confirmed!</h1>
+    <p>Thanks for shopping with NexShop.</p>
+    <div class="order-id">Order #{{ order.id }}</div>
+    <p style="margin-top:.5rem">Status: <strong style="color:var(--accent)">{{ order.get_status_display }}</strong></p>
+    <p>Total: <strong style="color:var(--accent)">${{ order.total_price }}</strong></p>
+    <p style="font-size:.875rem;margin-top:1rem">Shipping to: {{ order.shipping_address }}</p>
+    <div style="margin-top:2rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/orders/" class="btn-accent" style="padding:.65rem 1.5rem">View My Orders</a>
+      <a href="/" class="btn-outline" style="padding:.65rem 1.5rem">Continue Shopping</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

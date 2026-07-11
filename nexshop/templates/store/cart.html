@@ -1,0 +1,65 @@
+{% extends 'store/base.html' %}
+{% block title %}Cart — NexShop{% endblock %}
+{% block content %}
+
+<div class="container" style="padding-top:2.5rem">
+  <h1 class="section-title">Shopping Cart</h1>
+
+  {% if items %}
+    <div class="cart-layout">
+      <div>
+        {% for item in items %}
+        <div class="cart-item">
+          <div class="cart-item-img">
+            {% if item.product.image_url %}
+              <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}">
+            {% else %}📦{% endif %}
+          </div>
+          <div>
+            <div class="cart-item-name">{{ item.product.name }}</div>
+            <div class="cart-item-price">${{ item.product.price }} each</div>
+            <div class="qty-control" style="margin-top:.5rem;display:inline-flex">
+              <button onclick="updateQty({{ item.product.id }}, {{ item.quantity }} - 1)">−</button>
+              <span>{{ item.quantity }}</span>
+              <button onclick="updateQty({{ item.product.id }}, {{ item.quantity }} + 1)">+</button>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div class="cart-item-total">${{ item.subtotal }}</div>
+            <button class="remove-btn" onclick="removeItem({{ item.product.id }})" style="margin-top:.5rem">🗑 Remove</button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="order-summary">
+        <div class="summary-title">Order Summary</div>
+        {% for item in items %}
+          <div class="summary-row">
+            <span>{{ item.product.name }} ×{{ item.quantity }}</span>
+            <span>${{ item.subtotal }}</span>
+          </div>
+        {% endfor %}
+        <div class="summary-total">
+          <span>Total</span>
+          <span>${{ total }}</span>
+        </div>
+        {% if user.is_authenticated %}
+          <a href="/checkout/"><button class="btn-checkout">Proceed to Checkout →</button></a>
+        {% else %}
+          <a href="/login/?next=/checkout/"><button class="btn-checkout">Login to Checkout →</button></a>
+        {% endif %}
+        <a href="/" style="display:block;text-align:center;margin-top:1rem;font-size:.875rem;color:var(--text-muted)">← Continue Shopping</a>
+      </div>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">🛒</div>
+      <h2>Your cart is empty</h2>
+      <p>Add some products to get started.</p>
+      <a href="/" class="btn-accent" style="display:inline-block;margin-top:1.5rem;padding:.65rem 2rem">Shop Now</a>
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}

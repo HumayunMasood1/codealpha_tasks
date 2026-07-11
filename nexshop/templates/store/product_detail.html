@@ -1,0 +1,65 @@
+{% extends 'store/base.html' %}
+{% block title %}{{ product.name }} — NexShop{% endblock %}
+{% block content %}
+
+<div class="container" style="padding-top:3rem">
+  <a href="/" style="color:var(--text-muted);font-size:.875rem;display:inline-block;margin-bottom:2rem;">← Back to Shop</a>
+
+  <div class="product-detail-grid">
+    <div class="detail-img">
+      {% if product.image_url %}
+        <img src="{{ product.image_url }}" alt="{{ product.name }}">
+      {% else %}
+        📦
+      {% endif %}
+    </div>
+
+    <div>
+      <div class="detail-category">{{ product.category.name }}</div>
+      <h1 class="detail-name">{{ product.name }}</h1>
+      <div class="detail-price">${{ product.price }}</div>
+      <p class="detail-desc">{{ product.description }}</p>
+
+      {% if product.stock > 0 %}
+        <div style="margin-bottom:1rem;font-size:.875rem;color:var(--success)">✓ {{ product.stock }} items in stock</div>
+        <div class="qty-row">
+          <div class="qty-control">
+            <button onclick="changeQty(-1)">−</button>
+            <span id="qty-display">1</span>
+            <button onclick="changeQty(1)">+</button>
+          </div>
+          <button class="btn-accent" style="padding:.65rem 2rem" onclick="addToCartWithQty({{ product.id }})">Add to Cart</button>
+        </div>
+      {% else %}
+        <div style="color:var(--danger);margin-bottom:1rem;font-weight:600">✗ Out of Stock</div>
+      {% endif %}
+
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;margin-top:1.5rem;font-size:.85rem;color:var(--text-muted);">
+        🚚 Free shipping on orders over $50 &nbsp;·&nbsp; 30-day returns
+      </div>
+    </div>
+  </div>
+
+  {% if related %}
+  <div style="margin-top:4rem">
+    <h2 class="section-title">You Might Also Like</h2>
+    <div class="related-grid">
+      {% for p in related %}
+      <div class="product-card">
+        <a href="/product/{{ p.slug }}/">
+          <div class="product-img" style="aspect-ratio:1;font-size:2.5rem;">
+            {% if p.image_url %}<img src="{{ p.image_url }}" alt="{{ p.name }}">{% else %}📦{% endif %}
+          </div>
+          <div class="product-info">
+            <div class="product-name" style="font-size:.9rem">{{ p.name }}</div>
+            <div class="product-price">${{ p.price }}</div>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'store/base.html' %}
+{% block title %}Login — NexShop{% endblock %}
+{% block content %}
+
+<div class="container">
+  <div class="auth-card">
+    <div class="form-title">Welcome Back</div>
+
+    {% if error %}
+      <div class="error-msg">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" name="username" placeholder="your_username" required autofocus>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn-accent" style="width:100%;padding:.75rem;font-size:1rem;border-radius:6px;border:none;margin-top:.5rem">Login</button>
+    </form>
+
+    <div class="form-link">
+      Don't have an account? <a href="/register/">Sign up</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

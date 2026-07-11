@@ -1,0 +1,66 @@
+{% extends 'store/base.html' %}
+{% block title %}NexShop — Premium Tech Store{% endblock %}
+{% block content %}
+
+<div class="hero">
+  <div class="hero-inner">
+    <h1>Shop the <em>Future</em><br>Today.</h1>
+    <p>Premium products. Lightning delivery. Zero compromise.</p>
+    <a href="#products" class="btn-accent" style="display:inline-block;padding:.75rem 2rem;font-size:1rem;">Browse Products</a>
+  </div>
+</div>
+
+<div class="category-bar">
+  <a href="/" class="cat-btn {% if not selected_category %}active{% endif %}">All</a>
+  {% for cat in categories %}
+    <a href="/?category={{ cat.slug }}" class="cat-btn {% if selected_category == cat.slug %}active{% endif %}">{{ cat.name }}</a>
+  {% endfor %}
+</div>
+
+<div class="container" id="products">
+  {% if search %}
+    <p style="color:var(--text-muted);margin-bottom:1.5rem;">Results for "<strong style="color:var(--text)">{{ search }}</strong>" — {{ products|length }} found</p>
+  {% endif %}
+
+  {% if products %}
+    <div class="product-grid">
+      {% for product in products %}
+      <div class="product-card">
+        <a href="/product/{{ product.slug }}/">
+          <div class="product-img">
+            {% if product.image_url %}
+              <img src="{{ product.image_url }}" alt="{{ product.name }}">
+            {% else %}
+              📦
+            {% endif %}
+          </div>
+          <div class="product-info">
+            <div class="product-category">{{ product.category.name }}</div>
+            <div class="product-name">{{ product.name }}</div>
+            <div class="product-price">${{ product.price }}</div>
+            <div class="product-stock">
+              {% if product.stock > 0 %}{{ product.stock }} in stock{% else %}<span style="color:var(--danger)">Out of stock</span>{% endif %}
+            </div>
+          </div>
+        </a>
+        <div class="product-actions">
+          {% if product.stock > 0 %}
+            <button class="btn-full" onclick="addToCart({{ product.id }}, this)">Add to Cart</button>
+          {% else %}
+            <button class="btn-full" disabled style="opacity:.4;cursor:not-allowed">Out of Stock</button>
+          {% endif %}
+          <a href="/product/{{ product.slug }}/" class="btn-outline">View</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h2>No products found</h2>
+      <p>Try a different search or category.</p>
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}
