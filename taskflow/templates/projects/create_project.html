@@ -1,0 +1,55 @@
+{% extends 'projects/base.html' %}
+{% block title %}New Project — TaskFlow{% endblock %}
+{% block topbar_title %}Create Project{% endblock %}
+
+{% block content %}
+<div style="max-width:560px;margin:2rem auto;padding:0 1.5rem">
+  <h1 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;margin-bottom:2rem">New Project</h1>
+  <div class="detail-card">
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Project Name *</label>
+        <input type="text" name="name" class="form-control" placeholder="My Awesome Project" required autofocus>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea name="description" class="form-control" placeholder="What is this project about?"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Color</label>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <label style="cursor:pointer">
+            <input type="radio" name="color" value="#7c3aed" checked style="display:none">
+            <span style="display:block;width:28px;height:28px;border-radius:50%;background:#7c3aed;border:3px solid #fff"></span>
+          </label>
+          <label style="cursor:pointer">
+            <input type="radio" name="color" value="#2563eb" style="display:none">
+            <span style="display:block;width:28px;height:28px;border-radius:50%;background:#2563eb;border:3px solid transparent"></span>
+          </label>
+          <label style="cursor:pointer">
+            <input type="radio" name="color" value="#059669" style="display:none">
+            <span style="display:block;width:28px;height:28px;border-radius:50%;background:#059669;border:3px solid transparent"></span>
+          </label>
+          <label style="cursor:pointer">
+            <input type="radio" name="color" value="#d97706" style="display:none">
+            <span style="display:block;width:28px;height:28px;border-radius:50%;background:#d97706;border:3px solid transparent"></span>
+          </label>
+          <label style="cursor:pointer">
+            <input type="radio" name="color" value="#dc2626" style="display:none">
+            <span style="display:block;width:28px;height:28px;border-radius:50%;background:#dc2626;border:3px solid transparent"></span>
+          </label>
+          <label style="cursor:pointer">
+            <input type="radio" name="color" value="#db2777" style="display:none">
+            <span style="display:block;width:28px;height:28px;border-radius:50%;background:#db2777;border:3px solid transparent"></span>
+          </label>
+        </div>
+      </div>
+      <div style="display:flex;gap:.75rem;margin-top:1.5rem">
+        <button type="submit" class="btn btn-primary">Create Project →</button>
+        <a href="/" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

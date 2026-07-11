@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}TaskFlow{% endblock %}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body data-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}">
+
+{% if user.is_authenticated %}
+<div class="app-shell">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">Task<span>Flow</span></div>
+
+    <div class="nav-section">
+      <div class="nav-label">Menu</div>
+      <a href="/" class="nav-item {% block nav_dash %}{% endblock %}">
+        <span class="icon">🏠</span> Dashboard
+      </a>
+      <a href="/notifications/" class="nav-item {% block nav_notifs %}{% endblock %}">
+        <span class="icon">🔔</span> Notifications
+      </a>
+    </div>
+
+    {% if projects %}
+    <div class="nav-section">
+      <div class="nav-label">Projects</div>
+      {% for p in projects %}
+      <a href="/board/{{ p.id }}/" class="project-nav-item">
+        <span class="project-dot" style="background:{{ p.color }}"></span>
+        {{ p.name|truncatechars:22 }}
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="nav-section">
+      <a href="/project/create/" class="nav-item">
+        <span class="icon">➕</span> New Project
+      </a>
+    </div>
+
+    <div class="sidebar-bottom">
+      <a href="/logout/" class="nav-item">
+        <span class="icon">🚪</span> Logout ({{ user.username }})
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    <header class="topbar">
+      <div class="topbar-title">{% block topbar_title %}TaskFlow{% endblock %}</div>
+      <div class="topbar-actions">
+        <a href="/notifications/">
+          <button class="notif-btn">
+            🔔
+            <span class="notif-badge" id="notif-badge">0</span>
+          </button>
+        </a>
+        <div class="avatar">{{ user.username.0|upper }}</div>
+      </div>
+    </header>
+    {% block content %}{% endblock %}
+  </div>
+</div>
+{% else %}
+  {% block auth_content %}{% endblock %}
+{% endif %}
+
+{% load static %}
+<script src="{% static 'js/main.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

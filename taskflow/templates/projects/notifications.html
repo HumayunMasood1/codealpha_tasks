@@ -1,0 +1,29 @@
+{% extends 'projects/base.html' %}
+{% block title %}Notifications — TaskFlow{% endblock %}
+{% block nav_notifs %}active{% endblock %}
+{% block topbar_title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="page-content" style="max-width:680px">
+  <h1 class="page-title" style="margin-bottom:1.5rem">Notifications</h1>
+  {% if notifications %}
+    {% for notif in notifications %}
+    <a href="{{ notif.link|default:'#' }}">
+      <div class="notif-item {% if not notif.is_read %}unread{% endif %}">
+        <div class="notif-icon">🔔</div>
+        <div class="notif-content">
+          <div class="notif-message">{{ notif.message }}</div>
+          <div class="notif-time">{{ notif.created_at|timesince }} ago</div>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">🔔</div>
+    <h2>All caught up!</h2>
+    <p>No notifications yet.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

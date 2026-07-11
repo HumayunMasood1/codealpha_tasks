@@ -1,0 +1,85 @@
+{% extends 'projects/base.html' %}
+{% block title %}{{ project.name }} — TaskFlow{% endblock %}
+{% block topbar_title %}{{ project.name }}{% endblock %}
+
+{% block content %}
+<div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.5rem;border-bottom:1px solid var(--border)">
+  <div style="display:flex;align-items:center;gap:1rem">
+    <span style="width:12px;height:12px;border-radius:50%;background:{{ project.color }};display:inline-block"></span>
+    <span style="font-size:.875rem;color:var(--text-muted)">{{ project.description|truncatechars:60 }}</span>
+    <div style="display:flex;">
+      <div class="member-avatar" style="font-size:.7rem">{{ project.owner.username.0|upper }}</div>
+      {% for m in project.members.all|slice:":4" %}
+      <div class="member-avatar" style="font-size:.7rem;margin-left:-6px">{{ m.username.0|upper }}</div>
+      {% endfor %}
+    </div>
+  </div>
+  <div style="display:flex;gap:.5rem">
+    {% if user == project.owner %}
+    <a href="/project/{{ project.id }}/settings/" class="btn btn-secondary btn-sm">⚙ Settings</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Board -->
+<div class="board-wrapper" id="board">
+  {% for column in columns %}
+  <div class="column" data-column-id="{{ column.id }}">
+    <div class="column-header">
+      <div class="column-name">
+        {{ column.name }}
+        <span class="column-count">{{ column.tasks.count }}</span>
+      </div>
+      <div class="dropdown">
+        <button class="column-menu-btn" onclick="toggleDropdown('col-menu-{{ column.id }}')">•••</button>
+        <div class="dropdown-menu" id="col-menu-{{ column.id }}">
+          <button class="dropdown-item danger" onclick="deleteColumn({{ column.id }})">🗑 Delete Column</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="column-body" data-column-id="{{ column.id }}">
+      {% for task in column.tasks.all %}
+      <div class="task-card" data-task-id="{{ task.id }}" draggable="true">
+        <div class="task-card-priority priority-tag-{{ task.priority }}">{{ task.priority }}</div>
+        <div class="task-card-title">{{ task.title }}</div>
+        {% if task.assignees.all %}
+        <div style="display:flex;gap:.25rem;margin-bottom:.5rem">
+          {% for a in task.assignees.all|slice:":3" %}
+          <div class="avatar avatar-sm" title="{{ a.username }}">{{ a.username.0|upper }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <div class="task-card-footer">
+          <div class="task-card-meta">
+            <span>💬 {{ task.comments.count }}</span>
+            {% if task.due_date %}<span>📅 {{ task.due_date }}</span>{% endif %}
+          </div>
+          <a href="/task/{{ task.id }}/" style="font-size:.75rem;color:var(--accent2)">Open →</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Quick add -->
+    <div style="padding:.5rem">
+      <div style="display:flex;gap:.25rem">
+        <input type="text" placeholder="Add task..." class="form-control" style="font-size:.825rem;padding:.4rem .6rem"
+          onkeydown="if(event.key==='Enter')quickAddTask({{ column.id }},this.nextElementSibling)"
+          id="quick-input-{{ column.id }}">
+        <button class="btn btn-primary btn-sm" onclick="quickAddTask({{ column.id }}, document.getElementById('quick-input-{{ column.id }}'))">+</button>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+  <!-- Add Column -->
+  <button class="add-column-btn" onclick="addColumn({{ project.id }})">+ Add Column</button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  connectBoard({{ project.id }});
+</script>
+{% endblock %}

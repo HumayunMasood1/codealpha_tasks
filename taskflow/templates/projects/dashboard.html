@@ -1,0 +1,87 @@
+{% extends 'projects/base.html' %}
+{% block title %}Dashboard — TaskFlow{% endblock %}
+{% block nav_dash %}active{% endblock %}
+{% block topbar_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-content">
+  <div class="page-header">
+    <h1 class="page-title">Good work, {{ user.username }} 👋</h1>
+    <a href="/project/create/" class="btn btn-primary">+ New Project</a>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-card-label">Total Projects</div>
+      <div class="stat-card-value">{{ projects|length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Assigned Tasks</div>
+      <div class="stat-card-value">{{ my_tasks|length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Notifications</div>
+      <div class="stat-card-value">{{ notifications|length }}</div>
+    </div>
+  </div>
+
+  <!-- Projects -->
+  <div class="section-title">Your Projects</div>
+  {% if projects %}
+  <div class="projects-grid">
+    {% for project in projects %}
+    <a href="/board/{{ project.id }}/">
+      <div class="project-card" style="--project-color: {{ project.color }}">
+        <div class="project-card-name">{{ project.name }}</div>
+        <div class="project-card-desc">{{ project.description|truncatechars:80|default:"No description." }}</div>
+        <div class="project-card-meta">
+          <div class="member-avatars">
+            <div class="member-avatar">{{ project.owner.username.0|upper }}</div>
+            {% for m in project.members.all|slice:":3" %}
+            <div class="member-avatar">{{ m.username.0|upper }}</div>
+            {% endfor %}
+          </div>
+          <span>{{ project.columns.count }} columns</span>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+    <a href="/project/create/">
+      <div class="project-card" style="border-style:dashed;display:flex;align-items:center;justify-content:center;min-height:120px;color:var(--text-muted)">
+        <div style="text-align:center">
+          <div style="font-size:2rem;margin-bottom:.5rem">➕</div>
+          <div style="font-size:.875rem;font-weight:600">Create Project</div>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📋</div>
+    <h2>No projects yet</h2>
+    <p>Create your first project to get started.</p>
+    <a href="/project/create/" class="btn btn-primary" style="margin-top:1.5rem">+ Create Project</a>
+  </div>
+  {% endif %}
+
+  <!-- My Tasks -->
+  {% if my_tasks %}
+  <div class="section-title" style="margin-top:2rem">My Tasks</div>
+  <div class="task-list">
+    {% for task in my_tasks %}
+    <a href="/task/{{ task.id }}/">
+      <div class="task-list-item">
+        <div class="priority-dot priority-{{ task.priority }}"></div>
+        <div class="task-list-title">{{ task.title }}</div>
+        <div class="task-list-project">{{ task.column.project.name }} · {{ task.column.name }}</div>
+        {% if task.due_date %}
+        <div class="task-list-due">📅 {{ task.due_date }}</div>
+        {% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
