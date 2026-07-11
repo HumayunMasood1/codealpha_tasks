@@ -1,0 +1,36 @@
+{% extends 'social/base.html' %}
+{% block title %}Edit Profile — Pulse{% endblock %}
+
+{% block content %}
+<div class="feed-header"><h1>Edit Profile</h1></div>
+<div style="max-width:560px;margin:2rem auto;padding:0 1.5rem">
+  <form method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>First Name</label>
+      <input type="text" name="first_name" value="{{ user.first_name }}" placeholder="Your first name">
+    </div>
+    <div class="form-group">
+      <label>Last Name</label>
+      <input type="text" name="last_name" value="{{ user.last_name }}" placeholder="Your last name">
+    </div>
+    <div class="form-group">
+      <label>Bio</label>
+      <textarea name="bio" placeholder="Tell the world about yourself...">{{ profile.bio }}</textarea>
+    </div>
+    <div class="form-group">
+      <label>Avatar URL</label>
+      <input type="url" name="avatar_url" value="{{ profile.avatar_url }}" placeholder="https://...">
+    </div>
+    <div class="form-group">
+      <label>Location</label>
+      <input type="text" name="location" value="{{ profile.location }}" placeholder="Lahore, Pakistan">
+    </div>
+    <div class="form-group">
+      <label>Website</label>
+      <input type="url" name="website" value="{{ profile.website }}" placeholder="https://yoursite.com">
+    </div>
+    <button type="submit" class="btn-primary">Save Changes</button>
+  </form>
+</div>
+{% endblock %}

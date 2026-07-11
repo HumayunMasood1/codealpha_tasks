@@ -1,0 +1,129 @@
+{% extends 'social/base.html' %}
+{% block title %}@{{ profile_user.username }} — Pulse{% endblock %}
+{% block nav_profile %}{% if profile_user == user %}active{% endif %}{% endblock %}
+
+{% block content %}
+<div class="feed-header">
+  <a href="javascript:history.back()" style="color:var(--text-muted);font-size:.875rem">← Back</a>
+</div>
+
+<div class="profile-header">
+  <div class="profile-top">
+    <div class="avatar avatar-xl">
+      {% if profile.avatar_url %}<img src="{{ profile.avatar_url }}" alt="">
+      {% else %}{{ profile_user.username.0|upper }}{% endif %}
+    </div>
+    <div>
+      {% if user.is_authenticated %}
+        {% if profile_user == user %}
+          <a href="/settings/profile/"><button class="btn-edit">Edit Profile</button></a>
+        {% else %}
+          <button class="btn-follow-lg {% if is_following %}following{% endif %}" id="follow-btn"
+            onclick="toggleFollow('{{ profile_user.username }}', this)">
+            {% if is_following %}Following{% else %}Follow{% endif %}
+          </button>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="profile-name">
+    {% if profile_user.get_full_name %}{{ profile_user.get_full_name }}{% else %}{{ profile_user.username }}{% endif %}
+  </div>
+  <div class="profile-handle">@{{ profile_user.username }}</div>
+
+  {% if profile.bio %}
+  <div class="profile-bio">{{ profile.bio }}</div>
+  {% endif %}
+
+  <div class="profile-meta">
+    {% if profile.location %}<span>📍 {{ profile.location }}</span>{% endif %}
+    {% if profile.website %}<span>🔗 <a href="{{ profile.website }}" target="_blank" style="color:var(--accent2)">{{ profile.website }}</a></span>{% endif %}
+    <span>📅 Joined {{ profile_user.date_joined|date:"M Y" }}</span>
+  </div>
+
+  <div class="profile-stats">
+    <div class="stat">
+      <span class="stat-num">{{ profile.posts_count }}</span>
+      <span class="stat-label">Posts</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" id="followers-count">{{ profile.followers_count }}</span>
+      <span class="stat-label">Followers</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">{{ profile.following_count }}</span>
+      <span class="stat-label">Following</span>
+    </div>
+  </div>
+</div>
+
+{% if posts %}
+  {% for post in posts %}
+  <div class="post-card" id="post-{{ post.id }}">
+    <div class="post-header">
+      <div class="avatar">
+        {% if profile.avatar_url %}<img src="{{ profile.avatar_url }}" alt="">
+        {% else %}{{ profile_user.username.0|upper }}{% endif %}
+      </div>
+      <div class="post-meta">
+        <span class="post-author">{{ profile_user.username }}</span>
+        <span class="post-time">· {{ post.time_ago }}</span>
+      </div>
+      {% if profile_user == user %}
+      <div class="post-menu">
+        <button class="menu-btn" onclick="toggleMenu('menu-{{ post.id }}')">•••</button>
+        <div class="dropdown" id="menu-{{ post.id }}">
+          <button class="dropdown-item danger" onclick="deletePost({{ post.id }})">🗑 Delete</button>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    <a href="/post/{{ post.id }}/">
+      <div class="post-content">{{ post.content }}</div>
+      {% if post.image_url %}
+      <div class="post-image"><img src="{{ post.image_url }}" alt="" loading="lazy"></div>
+      {% endif %}
+    </a>
+    <div class="post-actions">
+      <button class="action-btn like-btn {% if post.id in liked_ids %}liked{% endif %}"
+        onclick="{% if user.is_authenticated %}toggleLike({{ post.id }}, this){% else %}window.location='/login/'{% endif %}">
+        <span class="icon">{% if post.id in liked_ids %}❤️{% else %}🤍{% endif %}</span>
+        <span class="like-count">{{ post.likes_count }}</span>
+      </button>
+      <a href="/post/{{ post.id }}/" class="action-btn">
+        <span class="icon">💬</span><span>{{ post.comments.count }}</span>
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="empty-state">
+    <div class="empty-icon">✍️</div>
+    <h2>No posts yet</h2>
+    <p>{% if profile_user == user %}Share your first post!{% else %}@{{ profile_user.username }} hasn't posted yet.{% endif %}</p>
+  </div>
+{% endif %}
+{% endblock %}
+
+{% block right_sidebar %}
+<aside class="sidebar-right">
+  {% if followers %}
+  <div class="sidebar-section">
+    <div class="sidebar-title">Followers</div>
+    {% for f in followers|slice:":5" %}
+    <div class="suggested-user">
+      <a href="/profile/{{ f.follower.username }}/">
+        <div class="avatar avatar-sm">{{ f.follower.username.0|upper }}</div>
+      </a>
+      <div class="suggested-info">
+        <a href="/profile/{{ f.follower.username }}/">
+          <div class="suggested-name">{{ f.follower.username }}</div>
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</aside>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% block auth_content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — Pulse</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">Pul<span>se</span></div>
+    <div class="auth-subtitle">Sign in to your account</div>
+    {% if error %}<div class="error-msg">{{ error }}</div>{% endif %}
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-group"><label>Username</label><input type="text" name="username" required autofocus></div>
+      <div class="form-group"><label>Password</label><input type="password" name="password" required></div>
+      <button type="submit" class="btn-primary">Login</button>
+    </form>
+    <div class="form-link">Don't have an account? <a href="/register/">Sign up</a></div>
+  </div>
+</div>
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'social/base.html' %}
+{% block title %}Search — Pulse{% endblock %}
+{% block nav_explore %}active{% endblock %}
+
+{% block content %}
+<div class="feed-header"><h1>Search</h1></div>
+<div style="padding:1.5rem">
+  <form method="GET" action="/search/" style="display:flex;gap:.5rem;margin-bottom:1.5rem">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search users and posts..."
+      style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:.7rem 1rem;font-family:inherit;font-size:.95rem;outline:none">
+    <button type="submit" class="btn-post" style="border-radius:8px;padding:.7rem 1.25rem">Search</button>
+  </form>
+
+  {% if q %}
+    {% if users %}
+      <div class="section-title">People</div>
+      {% for u in users %}
+      <a href="/profile/{{ u.username }}/" class="user-result">
+        <div class="avatar">{{ u.username.0|upper }}</div>
+        <div>
+          <div style="font-weight:700">{{ u.username }}</div>
+          <div style="font-size:.85rem;color:var(--text-muted)">{{ u.profile.bio|truncatechars:60 }}</div>
+        </div>
+      </a>
+      {% endfor %}
+    {% endif %}
+
+    {% if posts %}
+      <div class="section-title">Posts</div>
+      {% for post in posts %}
+      <div class="post-card" style="border:1px solid var(--border);border-radius:var(--radius);margin-bottom:.75rem">
+        <div class="post-header">
+          <div class="avatar avatar-sm">{{ post.author.username.0|upper }}</div>
+          <div class="post-meta">
+            <a href="/profile/{{ post.author.username }}/" class="post-author">@{{ post.author.username }}</a>
+            <span class="post-time">· {{ post.time_ago }}</span>
+          </div>
+        </div>
+        <a href="/post/{{ post.id }}/"><div class="post-content">{{ post.content }}</div></a>
+      </div>
+      {% endfor %}
+    {% endif %}
+
+    {% if not users and not posts %}
+      <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h2>No results for "{{ q }}"</h2>
+        <p>Try a different search term.</p>
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h2>Search Pulse</h2>
+      <p>Find people and posts.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

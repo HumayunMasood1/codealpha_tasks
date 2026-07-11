@@ -1,0 +1,123 @@
+{% extends 'social/base.html' %}
+{% block title %}Home — Pulse{% endblock %}
+{% block nav_feed %}active{% endblock %}
+
+{% block content %}
+<div class="feed-header"><h1>Home</h1></div>
+
+<!-- Inline compose -->
+<div class="compose-box">
+  <div class="avatar">
+    {% if user.profile.avatar_url %}<img src="{{ user.profile.avatar_url }}" alt="">
+    {% else %}{{ user.username.0|upper }}{% endif %}
+  </div>
+  <div class="compose-area">
+    <form method="POST" action="/post/create/" id="inline-form">
+      {% csrf_token %}
+      <textarea name="content" placeholder="What's happening?" 
+        oninput="updateCharCount(this,'inline-char-count')"></textarea>
+      <div id="inline-image-row" style="display:none;margin-top:.5rem">
+        <input type="url" name="image_url" placeholder="Image URL (optional)..."
+          style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:.5rem .875rem;font-family:inherit;font-size:.875rem;outline:none">
+      </div>
+      <div class="compose-footer">
+        <div class="compose-actions">
+          <button type="button" class="compose-action-btn" title="Add image"
+            onclick="const r=document.getElementById('inline-image-row');r.style.display=r.style.display==='none'?'block':'none'">🖼️</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem">
+          <span id="inline-char-count" class="char-count">500</span>
+          <button type="submit" class="btn-post">Post</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if posts %}
+  {% for post in posts %}
+  <div class="post-card" id="post-{{ post.id }}">
+    <div class="post-header">
+      <a href="/profile/{{ post.author.username }}/">
+        <div class="avatar">
+          {% if post.author.profile.avatar_url %}<img src="{{ post.author.profile.avatar_url }}" alt="">
+          {% else %}{{ post.author.username.0|upper }}{% endif %}
+        </div>
+      </a>
+      <div class="post-meta">
+        <a href="/profile/{{ post.author.username }}/" class="post-author">
+          {% if post.author.get_full_name %}{{ post.author.get_full_name }}{% else %}{{ post.author.username }}{% endif %}
+        </a>
+        <span class="post-username">@{{ post.author.username }}</span>
+        <span class="post-time">· {{ post.time_ago }}</span>
+      </div>
+      {% if post.author == user %}
+      <div class="post-menu">
+        <button class="menu-btn" onclick="toggleMenu('menu-{{ post.id }}')">•••</button>
+        <div class="dropdown" id="menu-{{ post.id }}">
+          <button class="dropdown-item danger" onclick="deletePost({{ post.id }})">🗑 Delete</button>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <a href="/post/{{ post.id }}/">
+      <div class="post-content">{{ post.content }}</div>
+      {% if post.image_url %}
+      <div class="post-image"><img src="{{ post.image_url }}" alt="post image" loading="lazy"></div>
+      {% endif %}
+    </a>
+
+    <div class="post-actions">
+      <button class="action-btn like-btn {% if post.id in liked_ids %}liked{% endif %}"
+        onclick="toggleLike({{ post.id }}, this)">
+        <span class="icon">{% if post.id in liked_ids %}❤️{% else %}🤍{% endif %}</span>
+        <span class="like-count">{{ post.likes_count }}</span>
+      </button>
+      <a href="/post/{{ post.id }}/" class="action-btn">
+        <span class="icon">💬</span>
+        <span>{{ post.comments.count }}</span>
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="empty-state">
+    <div class="empty-icon">🌱</div>
+    <h2>Your feed is empty</h2>
+    <p>Follow people to see their posts here, or <a href="/explore/" style="color:var(--accent2)">explore</a> what's happening.</p>
+  </div>
+{% endif %}
+{% endblock %}
+
+{% block right_sidebar %}
+<aside class="sidebar-right">
+  <form class="search-box" action="/search/" method="GET">
+    <input type="text" name="q" placeholder="Search Pulse...">
+    <button type="submit">🔍</button>
+  </form>
+
+  {% if suggested %}
+  <div class="sidebar-section">
+    <div class="sidebar-title">Who to Follow</div>
+    {% for u in suggested %}
+    <div class="suggested-user">
+      <a href="/profile/{{ u.username }}/">
+        <div class="avatar avatar-sm">
+          {% if u.profile.avatar_url %}<img src="{{ u.profile.avatar_url }}" alt="">
+          {% else %}{{ u.username.0|upper }}{% endif %}
+        </div>
+      </a>
+      <div class="suggested-info">
+        <a href="/profile/{{ u.username }}/">
+          <div class="suggested-name">{{ u.username }}</div>
+          <div class="suggested-handle">@{{ u.username }}</div>
+        </a>
+      </div>
+      <button class="btn-follow" onclick="toggleFollow('{{ u.username }}', this)">Follow</button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</aside>
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends 'social/base.html' %}
+{% block title %}Post by @{{ post.author.username }} — Pulse{% endblock %}
+
+{% block content %}
+<div class="feed-header">
+  <a href="javascript:history.back()" style="color:var(--text-muted);font-size:.875rem">← Back</a>
+</div>
+
+<div class="post-card" id="post-{{ post.id }}">
+  <div class="post-header">
+    <a href="/profile/{{ post.author.username }}/">
+      <div class="avatar">
+        {% if post.author.profile.avatar_url %}<img src="{{ post.author.profile.avatar_url }}" alt="">
+        {% else %}{{ post.author.username.0|upper }}{% endif %}
+      </div>
+    </a>
+    <div class="post-meta">
+      <a href="/profile/{{ post.author.username }}/" class="post-author">
+        {% if post.author.get_full_name %}{{ post.author.get_full_name }}{% else %}{{ post.author.username }}{% endif %}
+      </a>
+      <span class="post-username">@{{ post.author.username }}</span>
+      <span class="post-time">· {{ post.time_ago }}</span>
+    </div>
+    {% if user.is_authenticated and post.author == user %}
+    <div class="post-menu">
+      <button class="menu-btn" onclick="toggleMenu('menu-{{ post.id }}')">•••</button>
+      <div class="dropdown" id="menu-{{ post.id }}">
+        <button class="dropdown-item danger" onclick="deletePost({{ post.id }});setTimeout(()=>window.location='/',500)">🗑 Delete</button>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="post-content" style="font-size:1.1rem;line-height:1.7">{{ post.content }}</div>
+  {% if post.image_url %}
+  <div class="post-image"><img src="{{ post.image_url }}" alt=""></div>
+  {% endif %}
+
+  <div style="color:var(--text-muted);font-size:.8rem;margin:.75rem 0;padding:.75rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    {{ post.created_at|date:"g:i A · M j, Y" }}
+  </div>
+
+  <div class="post-actions" style="padding:.5rem 0">
+    <button class="action-btn like-btn {% if liked %}liked{% endif %}"
+      onclick="{% if user.is_authenticated %}toggleLike({{ post.id }}, this){% else %}window.location='/login/'{% endif %}">
+      <span class="icon">{% if liked %}❤️{% else %}🤍{% endif %}</span>
+      <span class="like-count">{{ post.likes_count }}</span> Likes
+    </button>
+    <span class="action-btn" style="cursor:default">
+      <span class="icon">💬</span>
+      <span id="comment-count">{{ comments.count }}</span> Comments
+    </span>
+  </div>
+</div>
+
+<!-- Comments -->
+<div style="padding:0 1.5rem">
+  {% if user.is_authenticated %}
+  <div class="comment-input-row">
+    <div class="avatar avatar-sm">
+      {% if user.profile.avatar_url %}<img src="{{ user.profile.avatar_url }}" alt="">
+      {% else %}{{ user.username.0|upper }}{% endif %}
+    </div>
+    <input type="text" id="comment-input" placeholder="Write a comment..." 
+      onkeydown="if(event.key==='Enter')submitComment({{ post.id }}, this, document.getElementById('comments-list'), document.getElementById('comment-count'))">
+    <button class="btn-comment" onclick="submitComment({{ post.id }}, document.getElementById('comment-input'), document.getElementById('comments-list'), document.getElementById('comment-count'))">Reply</button>
+  </div>
+  {% endif %}
+
+  <div id="comments-list">
+    {% for comment in comments %}
+    <div class="comment-item">
+      <a href="/profile/{{ comment.author.username }}/">
+        <div class="avatar avatar-sm">
+          {% if comment.author.profile.avatar_url %}<img src="{{ comment.author.profile.avatar_url }}" alt="">
+          {% else %}{{ comment.author.username.0|upper }}{% endif %}
+        </div>
+      </a>
+      <div class="comment-body">
+        <a href="/profile/{{ comment.author.username }}/" class="comment-author">@{{ comment.author.username }}</a>
+        <p class="comment-text">{{ comment.content }}</p>
+        <span class="comment-time">{{ comment.time_ago }}</span>
+      </div>
+    </div>
+    {% empty %}
+    <div style="text-align:center;padding:2rem;color:var(--text-muted);font-size:.875rem">No comments yet. Be the first!</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block right_sidebar %}
+<aside class="sidebar-right">
+  <div class="sidebar-section">
+    <div class="sidebar-title">About the Author</div>
+    <div style="display:flex;gap:.75rem;align-items:center">
+      <a href="/profile/{{ post.author.username }}/">
+        <div class="avatar">
+          {% if post.author.profile.avatar_url %}<img src="{{ post.author.profile.avatar_url }}" alt="">
+          {% else %}{{ post.author.username.0|upper }}{% endif %}
+        </div>
+      </a>
+      <div>
+        <a href="/profile/{{ post.author.username }}/" style="font-weight:700;font-size:.9rem">{{ post.author.username }}</a>
+        <div style="font-size:.8rem;color:var(--text-muted)">{{ post.author.profile.bio|truncatechars:60 }}</div>
+      </div>
+    </div>
+  </div>
+</aside>
+{% endblock %}

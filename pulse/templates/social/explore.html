@@ -1,0 +1,60 @@
+{% extends 'social/base.html' %}
+{% block title %}Explore — Pulse{% endblock %}
+{% block nav_explore %}active{% endblock %}
+
+{% block content %}
+<div class="feed-header"><h1>Explore</h1></div>
+
+{% if posts %}
+  {% for post in posts %}
+  <div class="post-card" id="post-{{ post.id }}">
+    <div class="post-header">
+      <a href="/profile/{{ post.author.username }}/">
+        <div class="avatar">
+          {% if post.author.profile.avatar_url %}<img src="{{ post.author.profile.avatar_url }}" alt="">
+          {% else %}{{ post.author.username.0|upper }}{% endif %}
+        </div>
+      </a>
+      <div class="post-meta">
+        <a href="/profile/{{ post.author.username }}/" class="post-author">
+          {% if post.author.get_full_name %}{{ post.author.get_full_name }}{% else %}{{ post.author.username }}{% endif %}
+        </a>
+        <span class="post-username">@{{ post.author.username }}</span>
+        <span class="post-time">· {{ post.time_ago }}</span>
+      </div>
+    </div>
+    <a href="/post/{{ post.id }}/">
+      <div class="post-content">{{ post.content }}</div>
+      {% if post.image_url %}
+      <div class="post-image"><img src="{{ post.image_url }}" alt="" loading="lazy"></div>
+      {% endif %}
+    </a>
+    <div class="post-actions">
+      <button class="action-btn like-btn {% if post.id in liked_ids %}liked{% endif %}"
+        onclick="{% if user.is_authenticated %}toggleLike({{ post.id }}, this){% else %}window.location='/login/'{% endif %}">
+        <span class="icon">{% if post.id in liked_ids %}❤️{% else %}🤍{% endif %}</span>
+        <span class="like-count">{{ post.likes_count }}</span>
+      </button>
+      <a href="/post/{{ post.id }}/" class="action-btn">
+        <span class="icon">💬</span><span>{{ post.comments.count }}</span>
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="empty-state">
+    <div class="empty-icon">🌍</div>
+    <h2>Nothing here yet</h2>
+    <p>Be the first to post something!</p>
+  </div>
+{% endif %}
+{% endblock %}
+
+{% block right_sidebar %}
+<aside class="sidebar-right">
+  <form class="search-box" action="/search/" method="GET">
+    <input type="text" name="q" placeholder="Search Pulse...">
+    <button type="submit">🔍</button>
+  </form>
+</aside>
+{% endblock %}
